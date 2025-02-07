@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Real Estate Management</h1>
+        <div class="auth-buttons">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a onclick="showChatbot()">Chatbot</a>
+            <a onclick="showPrediction()">Price Prediction</a>
+        </div>
+    </header>
+    <div class="main-content">
+        <div id="register-container">
+        <h1>Register</h1>
+        <form method="POST" onsubmit="return validateForm()">
+            <label>Name:</label>
+            <input type="text" name="name" required>
+            <label>Email:</label>
+            <input type="email" name="email" id="email" required>
+            <small id="email-error" class="error-message"></small>
+            <label>Password:</label>
+            <input type="password" name="password" id="password" required>
+            <small id="password-error" class="error-message"></small>
+            <label>Role:</label>
+            <select name="role">
+                <option value="admin">Admin</option>
+                <option value="owner">Owner</option>
+                <option value="customer">Customer</option>
+            </select>
+            <button type="submit">Register</button>
+        </form>
+        </div>
+
+        <div id="chatbot-container" class="container">
+            <p><strong>Chat with AI</strong></p>
+            <input type="text" id="user_input" placeholder="Enter your message"><br>
+            <button onclick="sendMessage()">Send</button>
+            <div id="response-container">
+                <p id="response"></p>
+            </div>
+        </div>
+        
+        <div id="prediction-container" class="container">
+            <p><strong>Real Estate Price Prediction</strong></p>
+            <input type="text" id="location" placeholder="Location"><br><br>
+            <input type="number" id="sqft" placeholder="Square Feet"><br><br>
+            <input type="number" id="bath" placeholder="Number of Bathrooms"><br><br>
+            <input type="number" id="bhk" placeholder="Number of BHK"><br><br>
+            <button onclick="predictPrice()">Predict</button>
+            <div id="price-response-container">
+                <p id="price-response"></p>
+            </div>
+        </div>
+
+    </div>
+    <footer>
+        <p style="text-align: center;">© 2025 Skanda P R | Contact: skandapr9@gmail.com</p>
+    </footer>
+
+    <script>
+
+        function validateForm() {
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let emailError = document.getElementById("email-error");
+            let passwordError = document.getElementById("password-error");
+
+            emailError.innerText = "";
+            passwordError.innerText = "";
+            
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co)$/;
+            if (!emailPattern.test(email)) {
+                emailError.innerText = "Invalid email format. Use a valid domain like gmail.com or yahoo.com.";
+                return false;
+            }
+
+            let passwordPattern = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9])(?=.*[a-zA-Z]).{10,}$/;
+            if (!passwordPattern.test(password)) {
+                passwordError.innerText = "Password must be at least 10 characters long, include 1 uppercase, 1 special character, and mix of letters & numbers.";
+                return false;
+            }
+
+            return true;
+        }
+
+        function showChatbot() {
+            document.getElementById("chatbot-container").style.display = "block";
+            document.getElementById("prediction-container").style.display = "none";
+            document.getElementById("register-container").style.display = "none";
+        }
+    
+        function showPrediction() {
+            document.getElementById("chatbot-container").style.display = "none";
+            document.getElementById("prediction-container").style.display = "block";
+            document.getElementById("register-container").style.display = "none";
+        }
+    
+        function sendMessage() {
+            let user_prompt = document.getElementById("user_input").value;
+            fetch('/get_response', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `user_prompt=${encodeURIComponent(user_prompt)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                let formattedResponse = data.response
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\n/g, "<br>");
+            document.getElementById("response").innerHTML = formattedResponse;
+            });
+        }
+    
+        function predictPrice() {
+            let location = document.getElementById("location").value;
+            let sqft = document.getElementById("sqft").value;
+            let bath = document.getElementById("bath").value;
+            let bhk = document.getElementById("bhk").value;
+    
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `location=${encodeURIComponent(location)}&sqft=${encodeURIComponent(sqft)}&bath=${encodeURIComponent(bath)}&bhk=${encodeURIComponent(bhk)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("price-response").innerText = "Predicted Price: ₹" + data.Predicted_Price.toFixed(2) + " k";
+            });
+        }
+        </script>
+</body>
+</html>
