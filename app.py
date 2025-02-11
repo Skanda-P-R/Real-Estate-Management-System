@@ -171,6 +171,7 @@ def delete_property(property_id):
 
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM properties WHERE id = %s", [property_id])
+    cur.execute("DELETE FROM bookings WHERE property_id = %s", [property_id])
     mysql.connection.commit()
     cur.close()
     flash("Property deleted successfully", "success")
