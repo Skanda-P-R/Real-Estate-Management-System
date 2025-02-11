@@ -37,6 +37,34 @@
             </tr>
             {% endfor %}
         </table>
+        <br>
+        {% if bookings %}
+        <h2>Properties Booked</h2>
+        <table border="1">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Location</th>
+                <th>Owner</th>
+                <th>Action</th>
+            </tr>
+            {% for booking in bookings %}
+            <tr>
+                <td>{{ booking[1] }}</td>
+                <td>{{ booking[2] }}</td>
+                <td>{{ booking[3] }}</td>
+                <td>{{ booking[4] }}</td>
+                <td>{{ booking[6] }}</td>
+                <td>
+                    <a href="{{ url_for('cancel_property', property_id=booking[0]) }}">Cancel Booking</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p style="margin-left: 30px; font-size: 20px;">No properties booked.</p>
+        {% endif %}
     </div>
     <footer>
         <p style="text-align: center;">© 2025 Skanda P R | Contact: skandapr9@gmail.com</p>

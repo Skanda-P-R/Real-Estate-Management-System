@@ -146,12 +146,18 @@ def owner_dashboard():
 def customer_dashboard():
     if session.get("role") != "customer":
         return redirect(url_for("login"))
+    
+    customer_id = session["user_id"]
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT p.id, p.title, p.description, p.price, p.location, p.status, u.name AS owner FROM properties p JOIN users u ON p.owner_id = u.id WHERE status = 'available'")
     properties = cur.fetchall()
+
+    cur.execute("SELECT p.id, p.title, p.description, p.price, p.location, p.status, u.name AS owner FROM properties p, users u, bookings b WHERE p.owner_id = u.id AND p.id = b.property_id AND p.status = 'booked' AND b.customer_id = %s", [customer_id])
+    bookings = cur.fetchall()
+
     cur.close()
-    return render_template("customer.html", properties=properties)
+    return render_template("customer.html", properties=properties, bookings=bookings)
 
 @app.route("/logout")
 def logout():
@@ -204,6 +210,22 @@ def book_property(property_id):
     cur.close()
 
     flash("Property booked successfully!", "success")
+    return redirect(url_for("customer_dashboard"))
+
+@app.route("/cancel_property/<int:property_id>")
+def cancel_property(property_id):
+    if session.get("role") != "customer":
+        return redirect(url_for("login"))
+
+    customer_id = session["user_id"]
+
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM bookings WHERE customer_id = %s AND property_id = %s", (customer_id, property_id))
+    cur.execute("UPDATE properties SET status = 'available' WHERE id = %s", [property_id])
+    mysql.connection.commit()
+    cur.close()
+
+    flash("Property canceled successfully!", "success")
     return redirect(url_for("customer_dashboard"))
 
 @app.route('/get_response', methods=['POST'])
