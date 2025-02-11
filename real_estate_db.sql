@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 07, 2025 at 11:54 AM
+-- Generation Time: Feb 11, 2025 at 12:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -39,9 +39,8 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`id`, `customer_id`, `property_id`, `booking_date`) VALUES
-(1, 3, 1, '2025-02-07 06:32:34'),
-(4, 4, 6, '2025-02-07 10:45:03'),
-(5, 4, 10, '2025-02-07 10:53:54');
+(5, 4, 10, '2025-02-07 10:53:54'),
+(8, 3, 1, '2025-02-11 11:20:44');
 
 -- --------------------------------------------------------
 
@@ -65,10 +64,8 @@ CREATE TABLE `properties` (
 
 INSERT INTO `properties` (`id`, `title`, `description`, `price`, `location`, `owner_id`, `status`) VALUES
 (1, '3BHK Flat in Srinagar', 'There is a 3BHK flat available for rent in Srinagar Bangalore.', 15000.00, 'Srinagar', 2, 'booked'),
-(2, '2BHK Apartment in Delhi', 'A well-furnished 2BHK apartment available for rent in Delhi.', 18000.00, 'Delhi', 2, 'available'),
-(3, 'Luxury Villa in Mumbai', 'A spacious 4BHK luxury villa with a sea view in Mumbai.', 75000.00, 'Mumbai', 2, 'available'),
 (4, 'Studio Apartment in Bangalore', 'A compact studio apartment suitable for bachelors in Bangalore.', 12000.00, 'Bangalore', 2, 'available'),
-(6, 'Penthouse in Hyderabad', 'A 5BHK penthouse with a rooftop pool in Hyderabad.', 90000.00, 'Hyderabad', 2, 'booked'),
+(6, 'Penthouse in Hyderabad', 'A 5BHK penthouse with a rooftop pool in Hyderabad.', 90000.00, 'Hyderabad', 2, 'available'),
 (8, 'Farmhouse in Goa', 'A serene farmhouse with a beachside view in Goa.', 60000.00, 'Goa', 2, 'available'),
 (9, '1RK PG in Kengeri', 'A spacious 1RK PG room is available for rent near RVCE college, Kengeri.', 5000.00, 'Kengeri', 2, 'available'),
 (10, '2BHK Penthouse in MG Road', 'A luxurious Penthouse is available for rent in MG Road. ', 100000.00, 'MG Road', 5, 'booked');
@@ -107,22 +104,23 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`) VALUES
 --
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `customer_id` (`customer_id`),
-  ADD KEY `property_id` (`property_id`);
+  ADD KEY `idx_customer_id` (`customer_id`),
+  ADD KEY `idx_property_id` (`property_id`);
 
 --
 -- Indexes for table `properties`
 --
 ALTER TABLE `properties`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `owner_id` (`owner_id`);
+  ADD KEY `idx_owner_id` (`owner_id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -132,7 +130,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `properties`
@@ -144,7 +142,7 @@ ALTER TABLE `properties`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
