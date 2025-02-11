@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Search</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Real Estate Management</h1>
+        <div class="auth-buttons">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('search') }}">Search</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a onclick="showChatbot()">Chatbot</a>
+            <a onclick="showPrediction()">Price Prediction</a>
+        </div>
+    </header>
+    <div class="main-content">
+        <div id="search-container">
+            <h1>Search</h1>
+            <form method="POST" onsubmit="showtable()">
+                <label>Title:</label>
+                <input type="text" id="title" name="title">
+
+                <label>Price:</label>
+                <input type="text" id="price" name="price">
+
+                <label>Location:</label>
+                <input type="text" id="location_search" name="location_search">
+
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div id="properties-search" {% if properties %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+            <h2>Available Properties</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if properties %}
+                    {% for property in properties %}
+                    {% if property[5]|string|lower == "booked" %}
+                    <tr style="background: #f839398c;">
+                        <td>{{ property[1] }}</td>
+                        <td>₹{{ property[3] }}</td>
+                        <td>{{ property[5] }}</td>
+                        <td><button class="view-details" onclick="openModal('{{ property[0] }}', '{{ property[1] }}', '{{ property[2] }}', '{{ property[3] }}', '{{ property[4] }}', '{{ property[5] }}', '{{ property[6] }}')">View</button></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td>{{ property[1] }}</td>
+                        <td>₹{{ property[3] }}</td>
+                        <td>{{ property[5] }}</td>
+                        <td><button class="view-details" onclick="openModal('{{ property[0] }}', '{{ property[1] }}', '{{ property[2] }}', '{{ property[3] }}', '{{ property[4] }}', '{{ property[5] }}', '{{ property[6] }}')">View</button></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p>No Available Properties found</p>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="propertyModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2 id="modalTitle"></h2>
+                <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                <p><strong>Price:</strong> ₹<span id="modalPrice"></span></p>
+                <p><strong>Location:</strong> <span id="modalLocation"></span></p>
+                <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                <p><strong>Owner:</strong> <span id="modalOwner"></span></p>
+    
+                <div class="image-slider">
+                    <button onclick="prevImage()">&#10094;</button>
+                    <img id="propertyImage" src="{{ url_for('static', filename='images/1.jpg') }}" alt="Property Image">
+                    <button onclick="nextImage()">&#10095;</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="chatbot-container" class="container">
+            <p><strong>Chat with AI</strong></p>
+            <input type="text" id="user_input" placeholder="Enter your message"><br>
+            <button onclick="sendMessage()">Send</button>
+            <div id="response-container">
+                <p id="response"></p>
+            </div>
+        </div>
+        
+        <div id="prediction-container" class="container">
+            <p><strong>Real Estate Price Prediction</strong></p>
+            <input type="text" id="location" placeholder="Location"><br><br>
+            <input type="number" id="sqft" placeholder="Square Feet"><br><br>
+            <input type="number" id="bath" placeholder="Number of Bathrooms"><br><br>
+            <input type="number" id="bhk" placeholder="Number of BHK"><br><br>
+            <button onclick="predictPrice()">Predict</button>
+            <div id="price-response-container">
+                <p id="price-response"></p>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <footer>
+        <p style="text-align: center;">© 2025 Skanda P R | Contact: skandapr9@gmail.com</p>
+    </footer>
+
+    <script>
+        function openModal(id, title, description, price, location, status, owner) {
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalDescription").innerText = description;
+            document.getElementById("modalPrice").innerText = price;
+            document.getElementById("modalLocation").innerText = location;
+            document.getElementById("modalStatus").innerText = status;
+            document.getElementById("modalOwner").innerText = owner;
+            document.getElementById("propertyModal").style.display = "block";
+        }
+    
+        function closeModal() {
+            document.getElementById("propertyModal").style.display = "none";
+        }
+    
+        window.onclick = function(event) {
+            let modal = document.getElementById("propertyModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        let currentImageIndex = 1; 
+        const totalImages = 15; 
+
+        function prevImage() {
+            if (currentImageIndex > 1) {
+                currentImageIndex--;
+            } else {
+                currentImageIndex = totalImages;
+            }
+            updateImage();
+        }
+
+        function nextImage() {
+            if (currentImageIndex < totalImages) {
+                currentImageIndex++;
+            } else {
+                currentImageIndex = 1;
+            }
+            updateImage();
+        }
+
+        function updateImage() {
+            document.getElementById("propertyImage").src = `/static/images/${currentImageIndex}.jpg`;
+        }
+
+        function showChatbot() {
+            document.getElementById("chatbot-container").style.display = "block";
+            document.getElementById("prediction-container").style.display = "none";
+            document.getElementById("properties-search").style.display = "none";
+            document.getElementById("search-container").style.display = "none";
+        }
+
+        function showPrediction() {
+            document.getElementById("chatbot-container").style.display = "none";
+            document.getElementById("prediction-container").style.display = "block";
+            document.getElementById("properties-search").style.display = "none";
+            document.getElementById("search-container").style.display = "none";
+        }
+
+        function sendMessage() {
+            let user_prompt = document.getElementById("user_input").value;
+            fetch('/get_response', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `user_prompt=${encodeURIComponent(user_prompt)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                let formattedResponse = data.response
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                    .replace(/\n/g, "<br>");
+                document.getElementById("response").innerHTML = formattedResponse;
+            });
+        }
+
+        function predictPrice() {
+            let location = document.getElementById("location").value;
+            let sqft = document.getElementById("sqft").value;
+            let bath = document.getElementById("bath").value;
+            let bhk = document.getElementById("bhk").value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `location=${encodeURIComponent(location)}&sqft=${encodeURIComponent(sqft)}&bath=${encodeURIComponent(bath)}&bhk=${encodeURIComponent(bhk)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("price-response").innerText = "Predicted Price: ₹" + data.Predicted_Price.toFixed(2) + " k";
+            });
+        }
+    </script>
+</body>
+</html>

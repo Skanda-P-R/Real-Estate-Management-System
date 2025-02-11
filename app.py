@@ -26,6 +26,43 @@ def home():
     cur.close()
     return render_template("index.html", properties=properties)
 
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        price = request.form.get("price", "").strip()
+        location = request.form.get("location_search", "").strip()
+
+        query = (
+            "SELECT p.id, p.title, p.description, p.price, p.location, p.status, u.name AS owner "
+            "FROM properties p "
+            "JOIN users u ON p.owner_id = u.id "
+            "WHERE 1=1 "
+        )
+
+        params = []
+
+        if title:
+            query += "AND p.title LIKE %s "
+            params.append(f"%{title}%")
+
+        if location:
+            query += "AND p.location LIKE %s "
+            params.append(f"%{location}%")
+
+        if price:
+            query += "AND p.price = %s "
+            params.append(price)
+
+        cur = mysql.connection.cursor()
+        cur.execute(query, tuple(params))
+        properties = cur.fetchall()
+        cur.close()
+
+        return render_template("search.html", properties=properties)
+
+    return render_template("search.html")
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
