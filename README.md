@@ -8,7 +8,7 @@
 ```pip install -r requirements.txt```
 
 ### 3. Install Xampp
-Download and install the XAMPP tool from [here](https://www.apachefriends.org/download.html).
+Download and install the XAMPP tool **Version 8.0.30** from [here](https://www.apachefriends.org/download.html).
 
 ### 4. Import the SQL template and data
 - Run the XAMPP Control Panel application, and Click on "Start" button for Apache and MySQL Module.
