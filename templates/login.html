@@ -118,7 +118,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("price-response").innerText = "Predicted Price: ₹" + data.Predicted_Price.toFixed(2) + " k";
+                document.getElementById("price-response").innerText = "Predicted Price: ₹" + data.Predicted_Price.toFixed(2);
             });
         }
     </script>

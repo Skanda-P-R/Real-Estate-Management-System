@@ -255,6 +255,7 @@ def predict():
         return lr_clf.predict([x])[0]
     
     predicted_price = predict_price(location,sqft,bath,bhk)
+    predicted_price = predicted_price * 89
 
     return jsonify({'Predicted_Price': predicted_price})
 
