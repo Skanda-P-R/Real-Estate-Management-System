@@ -82,6 +82,7 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error = None
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -101,9 +102,9 @@ def login():
             elif user[4] == "customer":
                 return redirect(url_for("customer_dashboard"))
         else:
-            flash("Invalid email or password", "danger")
+            error="Login Failed, Invalid Username or Password"
 
-    return render_template("login.html")
+    return render_template("login.html", error=error)
 
 @app.route("/admin")
 def admin_dashboard():

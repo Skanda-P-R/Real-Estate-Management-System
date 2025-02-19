@@ -26,7 +26,12 @@
 
                 <label>Password:</label>
                 <input type="password" id="password" name="password" required>
-                <small id="password-error" class="error-message"></small>
+                <br>
+                {% if error %}
+                    <p id="error" style="color: #8b0000;">
+                        {{ error }}
+                    </p><br>
+                {% endif %}
 
                 <button type="submit">Login</button>
             </form>
@@ -61,19 +66,15 @@
     <script>
         function validateForm() {
             let email = document.getElementById("email").value;
-            let password = document.getElementById("password").value;
             let emailError = document.getElementById("email-error");
-            let passwordError = document.getElementById("password-error");
 
             emailError.innerText = "";
-            passwordError.innerText = "";
 
             let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|in|co)$/;
             if (!emailPattern.test(email)) {
                 emailError.innerText = "Invalid email format. Use a valid domain like gmail.com or yahoo.com.";
                 return false;
             }
-
             return true;
         }
 
