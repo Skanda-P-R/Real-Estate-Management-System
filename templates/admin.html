@@ -35,6 +35,24 @@
             </tr>
             {% endfor %}
         </table>
+
+        <h2>Manage Users</h2>
+        <table border="1">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[4] }}</td>
+                <td><a href="{{ url_for('delete_user', user_id=user[0], role=user[4]) }}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
     <footer>
         <p style="text-align: center;">© 2025 Skanda P R | Contact: skandapr9@gmail.com</p>

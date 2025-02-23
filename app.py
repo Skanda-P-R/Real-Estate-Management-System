@@ -111,11 +111,16 @@ def admin_dashboard():
     if session.get("role") != "admin":
         return redirect(url_for("login"))
 
+    admin_id = session["user_id"]
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM properties")
     properties = cur.fetchall()
+
+    cur.execute("SELECT * FROM users WHERE id != %s", [admin_id])
+    users = cur.fetchall()
+
     cur.close()
-    return render_template("admin.html", properties=properties)
+    return render_template("admin.html", properties=properties,users=users)
 
 @app.route("/owner_dashboard")
 def owner_dashboard():
@@ -229,6 +234,39 @@ def cancel_property(property_id):
 
     flash("Property canceled successfully!", "success")
     return redirect(url_for("customer_dashboard"))
+
+@app.route("/delete_user/<int:user_id>/<string:role>")
+def delete_user(user_id,role):
+    if session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+    cur = mysql.connection.cursor()
+
+    if role == 'owner':
+        cur.execute("SELECT p.id FROM properties p WHERE p.owner_id = %s", [user_id])
+        property_ids = cur.fetchall()
+        for property_id in property_ids:
+            cur.execute("DELETE FROM bookings WHERE property_id = %s", [property_id[0]])
+            mysql.connection.commit()
+        cur.execute("DELETE FROM properties WHERE owner_id = %s", [user_id])
+        mysql.connection.commit()
+        cur.execute("DELETE FROM users WHERE id = %s", [user_id])
+        mysql.connection.commit()
+    else:
+        cur.execute("SELECT b.property_id FROM bookings b WHERE b.customer_id = %s", [user_id])
+        property_ids = cur.fetchall()
+        for property_id in property_ids:
+            cur.execute("UPDATE properties SET status = 'available' WHERE id = %s", [property_id[0]])
+            mysql.connection.commit()
+        cur.execute("DELETE FROM users WHERE id = %s", [user_id])
+        mysql.connection.commit()
+        cur.execute("DELETE FROM bookings WHERE customer_id = %s", [user_id])
+        mysql.connection.commit()
+
+    mysql.connection.commit()
+    cur.close()
+    flash("User deleted successfully", "success")
+    return redirect(url_for("admin_dashboard"))
 
 @app.route('/get_response', methods=['POST'])
 def get_response():
